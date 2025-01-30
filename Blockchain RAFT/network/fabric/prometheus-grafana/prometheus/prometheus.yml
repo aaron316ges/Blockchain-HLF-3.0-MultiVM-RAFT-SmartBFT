@@ -1,0 +1,51 @@
+global:
+  scrape_interval: 1s
+  external_labels:
+    monitor: 'devopsage-monitor'
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+  - job_name: "orderer0orgA"
+    static_configs:
+      - targets: ["orderer0.orgA-orderer.raft.com:9443"]
+  - job_name: "orderer1orgA"
+    static_configs:
+      - targets: ["orderer1.orgA-orderer.raft.com:9448"]
+  - job_name: "peer0_orgA"
+    static_configs:
+      - targets: ["peer0.orgA.raft.com:9444"]
+  - job_name: "peer1_orgA"
+    static_configs:
+      - targets: ["peer1.orgA.raft.com:12444"]
+  - job_name: "orderer0orgB"
+    static_configs:
+      - targets: ["orderer0.orgB-orderer.raft.com:10443"]
+  - job_name: "orderer1orgB"
+    static_configs:
+      - targets: ["orderer1.orgB-orderer.raft.com:10448"]
+  - job_name: "peer0_orgB"
+    static_configs:
+      - targets: ["peer0.orgB.raft.com:10444"]
+  - job_name: "peer1_orgB"
+    static_configs:
+      - targets: ["peer1.orgB.raft.com:13444"]
+  - job_name: "orderer0orgC"
+    static_configs:
+      - targets: ["orderer0.orgC-orderer.raft.com:11443"]
+  - job_name: "orderer1orgC"
+    static_configs:
+      - targets: ["orderer1.orgC-orderer.raft.com:11448"]
+  - job_name: "peer0_orgC"
+    static_configs:
+      - targets: ["peer0.orgC.raft.com:11444"]
+  - job_name: "peer1_orgC"
+    static_configs:
+      - targets: ["peer1.orgC.raft.com:14444"]
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['cadvisor:8080']
+  - job_name: node
+    static_configs:
+      - targets: ['node-exporter:9100']

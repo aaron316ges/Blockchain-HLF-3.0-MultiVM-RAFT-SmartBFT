@@ -1,0 +1,219 @@
+Organizations:
+  - &orgA-orderer
+    Name: orgA-orderer
+    ID: orgA-ordererMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.raft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgA-ordererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgA-ordererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgA-ordererMSP.admin')"
+    OrdererEndpoints:
+      - orderer0.orgA-orderer.raft.com:7050
+      - orderer1.orgA-orderer.raft.com:7055
+    
+  - &orgB-orderer
+    Name: orgB-orderer
+    ID: orgB-ordererMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.raft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgB-ordererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgB-ordererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgB-ordererMSP.admin')"
+    OrdererEndpoints:
+      - orderer0.orgB-orderer.raft.com:8050
+      - orderer1.orgB-orderer.raft.com:8055
+
+  - &orgC-orderer
+    Name: orgC-orderer
+    ID: orgC-ordererMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.raft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgC-ordererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgC-ordererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgC-ordererMSP.admin')"
+    OrdererEndpoints:
+      - orderer0.orgC-orderer.raft.com:9050
+      - orderer1.orgC-orderer.raft.com:9055
+
+  - &orgA
+    Name: orgAMSP
+    ID: orgAMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/peerOrganizations/orgA.raft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgAMSP.admin', 'orgAMSP.peer', 'orgAMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgAMSP.admin', 'orgAMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgAMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('orgAMSP.peer')"
+
+  - &orgB
+    Name: orgBMSP
+    ID: orgBMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/peerOrganizations/orgB.raft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgBMSP.admin', 'orgBMSP.peer', 'orgBMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgBMSP.admin', 'orgBMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgBMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('orgBMSP.peer')"
+
+  - &orgC
+    Name: orgCMSP
+    ID: orgCMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/peerOrganizations/orgC.raft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgCMSP.admin', 'orgCMSP.peer', 'orgCMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgCMSP.admin', 'orgCMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgCMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('orgCMSP.peer')"
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_5: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  Addresses:
+    - orderer0.orgA-orderer.raft.com:7050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  ChannelUsingRaft:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      OrdererType: etcdraft
+      EtcdRaft:
+        Consenters:
+          - Host: orderer0.orgA-orderer.raft.com
+            Port: 7050
+            ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.raft.com/orderers/orderer0.orgA-orderer.raft.com/tls/server.crt
+            ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.raft.com/orderers/orderer0.orgA-orderer.raft.com/tls/server.crt
+          - Host: orderer0.orgB-orderer.raft.com
+            Port: 8050
+            ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.raft.com/orderers/orderer0.orgB-orderer.raft.com/tls/server.crt
+            ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.raft.com/orderers/orderer0.orgB-orderer.raft.com/tls/server.crt
+          - Host: orderer0.orgC-orderer.raft.com
+            Port: 9050
+            ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.raft.com/orderers/orderer0.orgC-orderer.raft.com/tls/server.crt
+            ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.raft.com/orderers/orderer0.orgC-orderer.raft.com/tls/server.crt
+          - Host: orderer1.orgA-orderer.raft.com
+            Port: 7055
+            ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.raft.com/orderers/orderer1.orgA-orderer.raft.com/tls/server.crt
+            ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.raft.com/orderers/orderer1.orgA-orderer.raft.com/tls/server.crt
+          - Host: orderer1.orgB-orderer.raft.com
+            Port: 8055
+            ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.raft.com/orderers/orderer1.orgB-orderer.raft.com/tls/server.crt
+            ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.raft.com/orderers/orderer1.orgB-orderer.raft.com/tls/server.crt
+          - Host: orderer1.orgC-orderer.raft.com
+            Port: 9055
+            ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.raft.com/orderers/orderer1.orgC-orderer.raft.com/tls/server.crt
+            ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.raft.com/orderers/orderer1.orgC-orderer.raft.com/tls/server.crt
+      Organizations:
+        - *orgA-orderer
+        - *orgB-orderer
+        - *orgC-orderer
+      Capabilities: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *orgA
+        - *orgB
+        - *orgC
+      Capabilities: *ApplicationCapabilities

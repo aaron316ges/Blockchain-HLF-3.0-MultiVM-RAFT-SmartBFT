@@ -1,0 +1,75 @@
+OrdererOrgs:
+
+  - Name: orgA-orderer
+    Domain: orgA-orderer.bft.com
+    EnableNodeOUs: true
+
+    Specs:
+      - Hostname: orderer0
+        SANS:
+          - localhost
+      - Hostname: orderer1
+        SANS:
+          - localhost
+
+  - Name: orgB-orderer
+    Domain: orgB-orderer.bft.com
+    EnableNodeOUs: true
+
+    Specs:
+      - Hostname: orderer0
+        SANS:
+          - localhost
+      - Hostname: orderer1
+        SANS:
+          - localhost
+
+  - Name: orgC-orderer
+    Domain: orgC-orderer.bft.com
+    EnableNodeOUs: true
+
+    Specs:
+      - Hostname: orderer0
+        SANS:
+          - localhost
+      - Hostname: orderer1
+        SANS:
+          - localhost
+
+PeerOrgs:
+
+  - Name: orgA
+    Domain: orgA.bft.com
+    EnableNodeOUs: true
+    
+    Template:
+      Count: 2
+      SANS:
+        - localhost
+
+    Users:
+      Count: 1
+
+  - Name: orgB
+    Domain: orgB.bft.com
+    EnableNodeOUs: true
+    
+    Template:
+      Count: 2
+      SANS:
+        - localhost
+
+    Users:
+      Count: 1
+
+  - Name: orgC
+    Domain: orgC.bft.com
+    EnableNodeOUs: true
+    
+    Template:
+      Count: 2
+      SANS:
+        - localhost
+
+    Users:
+      Count: 1

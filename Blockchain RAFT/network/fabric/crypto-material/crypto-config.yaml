@@ -1,0 +1,75 @@
+OrdererOrgs:
+
+  - Name: orgA-orderer
+    Domain: orgA-orderer.raft.com
+    EnableNodeOUs: true
+
+    Specs:
+      - Hostname: orderer0
+        SANS:
+          - localhost
+      - Hostname: orderer1
+        SANS:
+          - localhost
+
+  - Name: orgB-orderer
+    Domain: orgB-orderer.raft.com
+    EnableNodeOUs: true
+
+    Specs:
+      - Hostname: orderer0
+        SANS:
+          - localhost
+      - Hostname: orderer1
+        SANS:
+          - localhost
+
+  - Name: orgC-orderer
+    Domain: orgC-orderer.raft.com
+    EnableNodeOUs: true
+
+    Specs:
+      - Hostname: orderer0
+        SANS:
+          - localhost
+      - Hostname: orderer1
+        SANS:
+          - localhost
+
+PeerOrgs:
+
+  - Name: orgA
+    Domain: orgA.raft.com
+    EnableNodeOUs: true
+    
+    Template:
+      Count: 2
+      SANS:
+        - localhost
+
+    Users:
+      Count: 1
+
+  - Name: orgB
+    Domain: orgB.raft.com
+    EnableNodeOUs: true
+    
+    Template:
+      Count: 2
+      SANS:
+        - localhost
+
+    Users:
+      Count: 1
+
+  - Name: orgC
+    Domain: orgC.raft.com
+    EnableNodeOUs: true
+    
+    Template:
+      Count: 2
+      SANS:
+        - localhost
+
+    Users:
+      Count: 1

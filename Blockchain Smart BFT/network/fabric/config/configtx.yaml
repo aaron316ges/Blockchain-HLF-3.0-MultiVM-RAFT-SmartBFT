@@ -1,0 +1,249 @@
+Organizations:
+  - &orgA-orderer
+    Name: orgA-orderer
+    ID: orgA-ordererMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.bft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgA-ordererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgA-ordererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgA-ordererMSP.admin')"
+    OrdererEndpoints:
+      - orderer0.orgA-orderer.bft.com:7050
+      - orderer1.orgA-orderer.bft.com:7055
+    
+  - &orgB-orderer
+    Name: orgB-orderer
+    ID: orgB-ordererMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.bft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgB-ordererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgB-ordererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgB-ordererMSP.admin')"
+    OrdererEndpoints:
+      - orderer0.orgB-orderer.bft.com:8050
+      - orderer1.orgB-orderer.bft.com:8055
+
+  - &orgC-orderer
+    Name: orgC-orderer
+    ID: orgC-ordererMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.bft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgC-ordererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgC-ordererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgC-ordererMSP.admin')"
+    OrdererEndpoints:
+      - orderer0.orgC-orderer.bft.com:9050
+      - orderer1.orgC-orderer.bft.com:9055
+
+  - &orgA
+    Name: orgAMSP
+    ID: orgAMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/peerOrganizations/orgA.bft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgAMSP.admin', 'orgAMSP.peer', 'orgAMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgAMSP.admin', 'orgAMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgAMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('orgAMSP.peer')"
+
+  - &orgB
+    Name: orgBMSP
+    ID: orgBMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/peerOrganizations/orgB.bft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgBMSP.admin', 'orgBMSP.peer', 'orgBMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgBMSP.admin', 'orgBMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgBMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('orgBMSP.peer')"
+
+  - &orgC
+    Name: orgCMSP
+    ID: orgCMSP
+    MSPDir: /home/ubuntu/network/fabric/organizations/peerOrganizations/orgC.bft.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('orgCMSP.admin', 'orgCMSP.peer', 'orgCMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('orgCMSP.admin', 'orgCMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('orgCMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('orgCMSP.peer')"
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V3_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_5: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  ChannelUsingBFT:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *orgA-orderer
+        - *orgB-orderer
+        - *orgC-orderer
+      Capabilities: *OrdererCapabilities
+      OrdererType: BFT
+      SmartBFT:
+        RequestBatchMaxCount: 100
+        RequestBatchMaxInterval: 50ms
+        RequestForwardTimeout: 2s
+        RequestComplainTimeout: 20s
+        RequestAutoRemoveTimeout: 3m0s
+        ViewChangeResendInterval: 5s
+        ViewChangeTimeout: 20s
+        LeaderHeartbeatTimeout: 1m0s
+        CollectTimeout: 1s
+        RequestBatchMaxBytes: 10485760
+        IncomingMessageBufferSize: 200
+        RequestPoolSize: 100000
+        LeaderHeartbeatCount: 10
+      ConsenterMapping:
+        - ID: 1
+          Host: orderer0.orgA-orderer.bft.com
+          Port: 7050
+          MSPID: orgA-ordererMSP
+          Identity: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.bft.com/orderers/orderer0.orgA-orderer.bft.com/msp/signcerts/orderer0.orgA-orderer.bft.com-cert.pem
+          ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.bft.com/orderers/orderer0.orgA-orderer.bft.com/tls/server.crt
+          ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.bft.com/orderers/orderer0.orgA-orderer.bft.com/tls/server.crt
+        - ID: 2
+          Host: orderer1.orgA-orderer.bft.com
+          Port: 7055
+          MSPID: orgA-ordererMSP
+          Identity: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.bft.com/orderers/orderer1.orgA-orderer.bft.com/msp/signcerts/orderer1.orgA-orderer.bft.com-cert.pem
+          ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.bft.com/orderers/orderer1.orgA-orderer.bft.com/tls/server.crt
+          ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgA-orderer.bft.com/orderers/orderer1.orgA-orderer.bft.com/tls/server.crt
+        - ID: 3
+          Host: orderer0.orgB-orderer.bft.com
+          Port: 8050
+          MSPID: orgB-ordererMSP
+          Identity: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.bft.com/orderers/orderer0.orgB-orderer.bft.com/msp/signcerts/orderer0.orgB-orderer.bft.com-cert.pem
+          ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.bft.com/orderers/orderer0.orgB-orderer.bft.com/tls/server.crt
+          ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.bft.com/orderers/orderer0.orgB-orderer.bft.com/tls/server.crt
+        - ID: 4
+          Host: orderer1.orgB-orderer.bft.com
+          Port: 8055
+          MSPID: orgB-ordererMSP
+          Identity: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.bft.com/orderers/orderer1.orgB-orderer.bft.com/msp/signcerts/orderer1.orgB-orderer.bft.com-cert.pem
+          ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.bft.com/orderers/orderer1.orgB-orderer.bft.com/tls/server.crt
+          ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgB-orderer.bft.com/orderers/orderer1.orgB-orderer.bft.com/tls/server.crt
+        - ID: 5
+          Host: orderer0.orgC-orderer.bft.com
+          Port: 9050
+          MSPID: orgC-ordererMSP
+          Identity: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.bft.com/orderers/orderer0.orgC-orderer.bft.com/msp/signcerts/orderer0.orgC-orderer.bft.com-cert.pem
+          ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.bft.com/orderers/orderer0.orgC-orderer.bft.com/tls/server.crt
+          ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.bft.com/orderers/orderer0.orgC-orderer.bft.com/tls/server.crt
+        - ID: 6
+          Host: orderer1.orgC-orderer.bft.com
+          Port: 9055
+          MSPID: orgC-ordererMSP
+          Identity: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.bft.com/orderers/orderer1.orgC-orderer.bft.com/msp/signcerts/orderer1.orgC-orderer.bft.com-cert.pem
+          ClientTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.bft.com/orderers/orderer1.orgC-orderer.bft.com/tls/server.crt
+          ServerTLSCert: /home/ubuntu/network/fabric/organizations/ordererOrganizations/orgC-orderer.bft.com/orderers/orderer1.orgC-orderer.bft.com/tls/server.crt
+
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *orgA
+        - *orgB
+        - *orgC
+      Capabilities: *ApplicationCapabilities
